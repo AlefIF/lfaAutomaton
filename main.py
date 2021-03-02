@@ -92,7 +92,21 @@ class AutomatoFD:
         s += '}'
         return s
 
-def lerAFDtxt():
+    def minimiza(self):
+        print('===================Minimizacao===================')
+        #verificando se o automato tem apenas um estado inicial
+        #acho q n precisa
+
+        #verificando se o automato e completo
+        if len(self.alfabeto) * len(self.estados) == len(self.transicoes):
+            print("Automato Completo - Seguindo")
+        else:
+            print("O automato nao e completo, criando novos estados")
+
+
+
+
+def exemploAFDFormat():
     print('=================================Calculo de AFD=================================')
     print('Forneca o endereco de um arquivo .txt com a seguinte formatacao das linhas:')
     print('(1) Conter o alfabeto')
@@ -118,9 +132,10 @@ def lerAFDtxt():
     print('-')
     print('abbabaabbbbbba')
     print('==================================FIM Exemplo==================================')
+    return 0
 
-    #arquivo = "C:/Users/aleff/Desktop/lfa/teste.txt"
-    arquivo = input('Digite o caminho do arquivo: ')
+def lerAFDtxt(arquivo):
+
     arquivoLeitura = open(arquivo, "r")
 
     i = 0
@@ -128,26 +143,38 @@ def lerAFDtxt():
     afd = ''
     cadeia = ''
 
+    #for que le o arquivo
     for linha in arquivoLeitura:
         argumento = linha.split()
         if i == 0:
             for y in argumento:
                 text += y
+            #foi necessario fazer o for incrementando a variavel text
+            #pois qd se passa o argumento as chaves [ ] vao junto
+            #virando um simbolo do alfabeto
             afd = AutomatoFD(text)
         elif i == 1:
+            #a quantidade de estados a serem criadas depende do numero
+            #que esta na posicao 0 da linha, incrementa +1 para o
+            #funcionamento correto do for
             for x in range(1, int(argumento[0]) + 1):
                 afd.criaEstado(x)
         elif i == 2:
             afd.mudaEstadoInicial(int(argumento[0]))
         elif i == 3:
             for y in argumento:
+                #o mesmo caso que ocorreu na criacao do alfabeto
                 afd.mudaEstadoFinal(int(y), True)
         elif i >= 4:
+            #enquanto o texto for diferente de -
+            #sera estanciado as transicoes
+            #muita gambiarra a frente
             if argumento[0] == '-':
                 i = -2
             else:
                 afd.criaTransicao(argumento[0], argumento[1], argumento[2])
         elif i == -1:
+            #zerando a variavel text
             text = ''
             for g in argumento:
                 text += g
@@ -160,10 +187,12 @@ def lerAFDtxt():
     parada = afd.move(cadeia)
     if not afd.deuErro() and afd.estadoFinal(parada):
         print('Aceita cadeia "{}"'.format(cadeia))
+        return afd
     else:
         print('Rejeita cadeia "{}"'.format(cadeia))
+        return 1
 
-    return 0
+
 
 def salvarAFDtxt():
     print('=================================Salvar AFD=================================')
@@ -192,8 +221,8 @@ def salvarAFDtxt():
     ADFtext.close()
     return 0
 
-def copiarAFDtxt():
-    print('=================================Salvar AFD=================================')
+def copiarAFtxt():
+    print('=================================Copiar AFD=================================')
     try:
         origAFD = open(input('Digite o diretorio do arquivo a ser copiado: '), 'r')
     except:
@@ -216,39 +245,94 @@ def copiarAFDtxt():
 
 if __name__ == '__main__':
 
-    inputN = -2
+    arquivo1 = "C:/Users/aleff/PycharmProjects/AFD/testeAFD.txt"
 
-    while inputN != '0':
+    while True:
         print('====================================MENU DE OPCOES====================================')
         print('1) Gerenciar AFD')
         print('2) Gerenciar AFN')
+        print('3) Testar AFS ja criados')
         print('0) Fechar Programa')
         inputN = input('Digite a opcao desejada: ')
         print('=================================')
         if inputN =='1':
-            print('1) Salvar o AFD em um arquivo texto')
-            print('2) Carregar o AFD de um arquivo texto')
+            print('1) Criar e Salvar o AFD em um txt')
+            print('2) Ler e Testar o AFD de txt')
             print('3) Criar cópia do AFD')
+            print('4) Calcular estados equivalentes do AFD')
+            print('5) Testar a equivalência entre dois AFD')
+            print('6) Calcular o autômato minimizado para um AFD')
             inputN = input('Digite a opcao desejada: ')
             print('=================================')
             if inputN == '1':
-                salvarAFDtxt()
-            elif inputN == '2':
-                if lerAFDtxt() == 0:
-                    print('criado com sucesso')
+                if salvarAFDtxt() == 0:
+                    print('Salvo com sucesso')
                 else:
-                    print("Erro de criacao")
+                    print('Falha no salvamento')
+            elif inputN == '2':
+                exemploAFDFormat()
+                arquivo = input('Digite o caminho do arquivo: ')
+                lerAFDtxt(arquivo)
             elif inputN == '3':
-                if copiarAFDtxt() == 0:
+                if copiarAFtxt() == 0:
+                    print('Copiado com sucesso')
+                else:
+                    print('Falha na copia')
+            elif inputN == '4':
+                if copiarAFtxt() == 0:
+                    print('Copiado com sucesso')
+                else:
+                    print('Falha na copia')
+            elif inputN == '5':
+                if copiarAFtxt() == 0:
+                    print('Copiado com sucesso')
+                else:
+                    print('Falha na copia')
+            elif inputN == '6':
+                arquivo = input('Digite o caminho do arquivo: ')
+                afdm=lerAFDtxt(arquivo)
+                if(afdm != 1):
+                    afdm.minimiza()
+                else:
+                    print("Automato nao aceito")
+            else:
+                print('Opcao invalida')
+        elif inputN == '2':
+            print('1) Criar e Salvar o AFN em um txt')
+            print('2) Ler e Testar o AFN de txt')
+            print('3) Criar cópia do AFN')
+            inputN = input('Digite a opcao desejada: ')
+            print('=================================')
+            if inputN == '1':
+                ''' if salvarAFNtxt() == 0:
+                    print('Salvo com sucesso')
+                else:
+                    print('Falha no salvamento')'''
+            elif inputN == '2':
+               '''  if lerAFNtxt() == 0:
+                    print('Lido com sucesso')
+                else:
+                    print("Erro de Leitura")'''
+            elif inputN == '3':
+                if copiarAFtxt() == 0:
                     print('Copiado com sucesso')
                 else:
                     print('Falha na copia')
             else:
                 print('Opcao invalida')
-        elif inputN == '2':
-            print('AFN')
+        elif inputN == '3':
+            print('1: Testar um AFD')
+            print('2: Testar um AFN')
+            print('3: Testar AFD com estado equivalente')
+            print('4: Testar a equivalencia de 2 AFDs')
+            print('5: Testar minimizacao')
+            inputN = input('Digite a opcao desejada: ')
+            print('=================================')
+            if inputN == '1':
+                lerAFDtxt(arquivo1)
         elif inputN == '0':
             print('Fechando')
+            break
         else:
             print('Opcao invalida')
 
